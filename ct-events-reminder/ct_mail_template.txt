@@ -1,0 +1,11 @@
+{{TITLE}}
+
+Hallo {{FIRSTNAME}},
+
+Es sind in den nächsten {{TIME}} Tagen noch folgende Dienste offen:
+
+{{EVENT_ROWS}}
+
+[Gehe zu Dienste](https://{{DOMAIN}}/?q=churchservice) [Benachrichtigung deaktivieren](https://{{DOMAIN}}/?q=churchservice#SettingsView)
+
+Diese E-Mail wurde von [{{TITLE}}](https://{{DOMAIN}}/) gesendet. Bei Fragen dazu wende dich bitte an {{REPLYMAIL}}.

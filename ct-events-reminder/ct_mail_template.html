@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang=“de“>
+<head >
+    <meta charset=utf-8/>
+    <title></title>
+    <style>
+        <!--
+        @media screen {
+            /* hides this rule from unsupported clients */
+            body {
+                font-family: Lato, system-ui, sans-serif;
+                padding: 16px;
+            }
+
+            .header {
+                padding: 20px 10%;
+                text-align: center
+            }
+            .mail-content h1, .mail-content  h2, .mail-content  h3 {
+                margin-top: 0;
+                margin-bottom: 24px;
+                font-weight: bold;
+            }
+
+            p {
+                font-weight: 400;
+                line-height: 20px;
+            }
+            .mail-content,
+            .mail-content p,
+            .mail-content li {
+                overflow-wrap: anywhere;
+                word-wrap: break-word;
+                word-break: break-word;
+            }
+            a {
+                color: #2563eb;
+                overflow-wrap: anywhere;
+                word-wrap: break-word;
+            }
+            .mail-footer a {
+                color: #64748B;
+            }
+            a.button, .button {
+                background-color: #2563eb;
+                padding: 11px;
+                text-align: center;
+                font-weight: 700;
+                color: white;
+                margin-top: 16px;
+                margin-bottom: 16px;
+                text-decoration: initial;
+                display: block;
+                border-radius: 6px;
+                border: 1px solid #2563eb;
+                overflow-wrap: normal;
+                word-wrap: normal;
+                word-break: normal;
+            }
+            a.button.secondary, .button.secondary {
+                background-color: white;
+                color: #2563eb !important;
+                border-color: #CBD5E1;
+            }
+            a.button.text, .button.text {
+                background-color: white;
+                color: #475569;
+                border: none;
+            }
+            a.button:hover, .button:hover {
+                text-decoration: none;
+            }
+        }
+        -->
+    </style>
+
+</head>
+<body style="
+	-webkit-hyphens: auto;
+	-moz-hyphens: auto;
+	-ms-hyphens: auto;
+	hyphens: auto;
+	background-color: #f1f5f9;
+	margin: 0;
+	padding: 16px;
+	font-family: Lato, system-ui, sans-serif;
+	font-size: 14px;
+	color: #0F172A;
+"
+>
+
+
+<div style=" max-width: 504px; margin: auto; background-color: #f1f5f9; padding-left: 0; padding-right: 0px; margin-top: 0px; ">
+    <div class="header" style="padding:32px 10% 24px;text-align:center">
+        <div style="height:54px;width:54px;margin:auto;background:white;border-radius:10px;padding:6px;border:1px solid #DBE1E7;box-sizing: border-box"><img src="{{LOGO}}" alt="Logo" height="40" width="40" style="object-fit:contain;border-radius:3px"/></div>
+        <h3 style="font-weight:700;font-size:18px;line-height:26px;color:#64748B;margin:24px 0 0">{{TITLE}}</h3>
+    </div>
+    <div class="mail-content" style="padding:24px;background-color:white;border-radius: 8px;border: 1px solid #E2E8F0;overflow-wrap:anywhere;word-wrap:break-word;word-break:break-word;">
+        <h3>Hallo {{FIRSTNAME}},</h3>
+<p>Es sind in den nächsten {{TIME}} Tagen noch folgende Dienste offen:</p>
+<table class="table table-condensed" style="width:100%; border-collapse: collapse; table-layout: fixed;">
+{{EVENT_ROWS}}
+</table>
+<a class="button" href="https://{{DOMAIN}}/?q=churchservice">
+Gehe zu Dienste
+</a>
+<a class="button" href="https://{{DOMAIN}}/?q=churchservice#SettingsView">
+Benachrichtigung deaktivieren
+</a>
+
+    </div>
+    <div class="mail-footer" style="padding:24px 10% 32px;font-size:11px;line-height:16px">
+        <p style="margin: 0px;color:#64748B;text-align:center;margin-bottom:24px">
+            Diese E-Mail wurde von <a href='https://{{DOMAIN}}/'>{{TITLE}}</a> gesendet. Bei Fragen dazu wende dich bitte an <a href="mailto:{{REPLYMAIL}}">{{REPLYMAIL}}</a>.
+        </p>
+        
+        <div style="color:#64748B;text-align:center">
+            <span>
+                <img src="https://{{DOMAIN}}/system/assets/ico/ChurchTools_cross_gray.png" width="14" height="13" style="height:13px;width:14px;display:inline;">
+            </span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

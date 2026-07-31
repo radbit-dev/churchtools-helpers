@@ -1,0 +1,19 @@
+{
+  "accessCheck":true,
+  "accessToken":"YOUR_SCRIPT_ACCESS_TOKEN",
+  "apiToken":"YOUR_CHURCHTOOLS_API_TOKEN",
+  "calendars":[1,2],
+  "dateOffset":60,
+  "excludedServices":[99],
+  "mailerSleep":30000,
+  "checkInformLeader":true,
+  "testMode":false,
+  "testEmail":"test@example.com",
+  "mailFrom":"YOUR_FROM_MAIL",
+  "mailSubject":"YOUR_MAIL_SUBJECT",
+  "timezone":"Europe/Berlin",
+  "ctDomain":"your.church.tools",
+  "ctReplyMail":"YOUR_CHURCHTOOLS_REPLY_MAIL",
+  "ctMailLogo":"URL_TO_YOUR_LOGO",
+  "ctMailTitle":"YOUR_TITLE_IN_THE_MAIL"
+}
