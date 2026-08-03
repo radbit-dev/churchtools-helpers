@@ -1,5 +1,10 @@
 # ChurchTools Open Services Reminder
 
+#### (Choose your language below / Wähle Deine Sprache)
+[![English](https://img.shields.io/badge/Language-English-blue)](README.md)
+[![Deutsch](https://img.shields.io/badge/Language-Deutsch-green)](README.de.md)
+---
+
 Automatically scans upcoming ChurchTools events for unfilled services and sends reminder emails to **all members**, not just the leaders, in the responsible service groups.
 
 The script is intended to be executed periodically (e.g. via cron) and informs all eligible persons about open services they can apply for.
