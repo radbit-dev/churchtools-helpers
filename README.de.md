@@ -15,3 +15,5 @@ Viel Spaß beim Verwenden / Kopieren / Anpassen.
 
 * **Offene Dienste Benachrichtigung**: [ct-events-reminder](ct-events-reminder/README.de.md)\
     Durchsucht automatisch bevorstehende ChurchTools-Veranstaltungen nach unbesetzten Diensten und sendet Erinnerungs-E-Mails an **alle Mitglieder**, nicht nur an die Leiter, der jeweils zuständigen Dienstgruppen.
+* **Wordpress Snippets**: [ct-wordpress-snippets](ct-wordpress-snippets/)\
+    Stellt PHP-Skripte als WordPress-Snippets bereit, um auf die ChurchTools-API zuzugreifen und sie auf WordPress-Seiten zu verwenden.

@@ -14,3 +14,5 @@ Have fun using / copying / changing.
 
 * **Open Service Reminder**: [ct-events-reminder](ct-events-reminder/)\
     Automatically scans upcoming ChurchTools events for unfilled services and sends reminder emails to **all members**, not just the leaders, in the responsible service groups.
+* **Wordpress Snippets**: [ct-wordpress-snippets](ct-wordpress-snippets/)\
+    Provides PHP scripts as WordPress snippets to access and use the ChurchTools API in Wordpress pages.
