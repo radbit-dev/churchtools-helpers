@@ -1,87 +1,191 @@
 <?php
 
-// main function to call the CT API with the required API Path and Method, which returns the supplied array.
-function sendCalRequest($url, $data, $method) {
-	
-	// add your token to your wp-config.php: define('CHURCHTOOLS_API_TOKEN', 'your-token');
+
+/**
+ * Send a request to the ChurchTools API.
+ *
+ * @param string $url    API URL or path.
+ * @param array  $data   Request data.
+ * @param string $method HTTP method (GET, POST, PUT, DELETE, ...).
+ *
+ * @return array|string Decoded API response or "Error".
+ */
+function sendCalRequest(string $url, array $data = [], string $method = 'GET'): array|string
+{
+    // Add your token to wp-config.php:
+    // define('CHURCHTOOLS_API_TOKEN', 'your-token');
     $apiToken = CHURCHTOOLS_API_TOKEN;
-	$sessionCookie = get_transient('churchtools_session_cookie');
 
-	//set up http request
-	$options = array(
-		'http'=>array(
-			'header' => "Authorization: Login ".$apiToken
-			 . (!empty($sessionCookie)
-                    ? "\r\nCookie: ".$sessionCookie
-                    : ""),
-			'method' => $method,
-			'content' => http_build_query($data),
-			'timeout' => 10,
-		)
-	);
-	
-	// setup stream context for http call and parse the url
-	$context = stream_context_create($options);
-	$url = unparse_url(parse_url($url));
+    // Get existing ChurchTools session cookie.
+    $sessionCookie = get_transient('churchtools_session_cookie');
 
-	//check session cookie and (re)create if empty or expired
-	if (false === ($sessionCookie = get_transient('churchtools_session_cookie'))) {
-        $getcookies = get_headers($url,1,$context);
-		setChurchToolsSessionCookie($getcookies['set-cookie']);
+    // Parse and normalize URL.
+    $url = unparse_url(parse_url($url));
+
+    // If no session cookie exists, create one.
+    if ($sessionCookie === false || empty($sessionCookie)) {
+        $cookieContext = stream_context_create([
+            'http' => [
+                'header'  => 'Authorization: Login ' . $apiToken,
+                'method'  => 'GET',
+                'timeout' => 10,
+            ],
+        ]);
+
+        $headers = get_headers($url, true, $cookieContext);
+
+        if ($headers !== false && isset($headers['Set-Cookie'])) {
+            setChurchToolsSessionCookie($headers['Set-Cookie']);
+        }
+
+        // Retrieve the newly created cookie.
+        $sessionCookie = get_transient('churchtools_session_cookie');
     }
 
-	// make the http call and get / decode response
-	if ($result = file_get_contents($url, false, $context)) {
-		$obj = json_decode($result, true);
-		return $obj;
-	} else {
-		return "Error";
-		exit;
-	}
+    // Build request headers.
+    $headers = [
+        'Authorization: Login ' . $apiToken,
+        'Content-Type: application/x-www-form-urlencoded',
+    ];
+
+    if (!empty($sessionCookie) && is_string($sessionCookie)) {
+        $headers[] = 'Cookie: ' . $sessionCookie;
+    }
+
+    // Set up HTTP request.
+    $options = [
+        'http' => [
+            'header'        => implode("\r\n", $headers),
+            'method'        => strtoupper($method),
+            'content'       => http_build_query($data, '', '&'),
+            'timeout'       => 10,
+            'ignore_errors' => true,
+        ],
+    ];
+
+    $context = stream_context_create($options);
+
+    // Make HTTP request.
+    $result = file_get_contents($url, false, $context);
+
+    if ($result === false) {
+        return 'Error';
+    }
+
+    // Decode JSON response.
+    try {
+        return json_decode(
+            $result,
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+    } catch (JsonException $e) {
+        return 'Error';
+    }
 }
 
-//Extract CT Session Cookie and store as transient
-function setChurchToolsSessionCookie($cookie) {
 
-    // Extract Expires from cookie
+/**
+ * Extract ChurchTools session cookie and store it as a WordPress transient.
+ *
+ * @param string|array $cookies Set-Cookie header(s).
+ *
+ * @return bool True if the cookie was stored successfully.
+ */
+function setChurchToolsSessionCookie(string|array $cookies): bool
+{
+    // get_headers(..., true) can return multiple Set-Cookie headers as an array.
+    if (is_array($cookies)) {
+        // Use the first cookie containing an expiry date.
+        foreach ($cookies as $cookie) {
+            if (is_string($cookie) && preg_match(
+                '/(?:^|;\s*)Expires=([^;]+)/i',
+                $cookie,
+                $matches
+            )) {
+                $cookies = $cookie;
+                break;
+            }
+        }
+
+        // If no suitable cookie was found, use the first string value.
+        if (is_array($cookies)) {
+            $cookies = reset($cookies);
+
+            if (!is_string($cookies)) {
+                return false;
+            }
+        }
+    }
+
+    // Extract Expires from cookie.
     $expires = 0;
-	if (preg_match('/(?:^|;\s*)Expires=([^;]+)/i', $cookie, $matches)) {
-		$expires = strtotime(trim($matches[1]));
-	}
 
-    // Refresh 5 minutes before expiry
+    if (preg_match(
+        '/(?:^|;\s*)Expires=([^;]+)/i',
+        $cookies,
+        $matches
+    )) {
+        $expires = strtotime(trim($matches[1]));
+
+        if ($expires === false) {
+            $expires = 0;
+        }
+    }
+
+    // Refresh 5 minutes before expiry.
     $refreshBuffer = 300;
 
+    if ($expires <= 0) {
+        return false;
+    }
+
     $transientLifetime = max(
-         ($expires - time()) - $refreshBuffer,
+        ($expires - time()) - $refreshBuffer,
         60
     );
-	
-	//if expires extracted, then set transient with cookie
-	if ($expires != 0) {
-		$cookie = strtok($cookie, ';');
-		set_transient(
-			'churchtools_session_cookie',
-			$cookie,
-			$transientLifetime
-		);
-		return true;
-	} else {
-		return false;
-	}
 
+    // Only store the actual cookie name=value part.
+    $cookie = strtok($cookies, ';');
+
+    if (!is_string($cookie) || $cookie === '') {
+        return false;
+    }
+
+    return set_transient(
+        'churchtools_session_cookie',
+        $cookie,
+        $transientLifetime
+    );
 }
 
-//Extract URL and check for scheme and host, replace if not provided with default
-function unparse_url($parsed_url) {
 
-	// add your default CT host to your wp-config.php: define('CHURCHTOOLS_DEFAULT_HOST', 'your-host.church.tools');
-	$host = CHURCHTOOLS_DEFAULT_HOST;
-	
-	$scheme = $parsed_url['scheme'] ?? 'https';
-    $host   = $parsed_url['host'] ?? $host;
-    $path   = isset($parsed_url['path']) ? '/' . ltrim($parsed_url['path'], '/') : '';
-    $query  = isset($parsed_url['query']) ? '?' . $parsed_url['query'] : '';
+/**
+ * Normalize a parsed URL and add the default ChurchTools host if necessary.
+ *
+ * @param array|false $parsedUrl Result from parse_url().
+ *
+ * @return string
+ */
+function unparse_url(array|false $parsedUrl): string
+{
+    // Add your default CT host to wp-config.php:
+    // define('CHURCHTOOLS_DEFAULT_HOST', 'your-host.church.tools');
+
+    $parsedUrl = is_array($parsedUrl) ? $parsedUrl : [];
+
+    $host = CHURCHTOOLS_DEFAULT_HOST;
+
+    $scheme = $parsedUrl['scheme'] ?? 'https';
+    $host   = $parsedUrl['host'] ?? $host;
+    $path   = isset($parsedUrl['path'])
+        ? '/' . ltrim($parsedUrl['path'], '/')
+        : '';
+    $query  = isset($parsedUrl['query'])
+        ? '?' . $parsedUrl['query']
+        : '';
+
     return $scheme . '://' . $host . $path . $query;
 }
 
