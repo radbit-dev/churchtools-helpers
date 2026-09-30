@@ -99,7 +99,8 @@ function sendCalRequest($url, $data, $method) {
     
     if (empty($sessionCookie)) {
         $getcookies = get_headers($url,1,$context);
-        $sessionCookie = strtok($getcookies['set-cookie'], ';');
+        $setCookie = $getcookies['set-cookie'];
+		$sessionCookie = strtok(is_array($setCookie) ? $setCookie[0] : $setCookie, ';');
     }
     
     if ($result = file_get_contents($url, false, $context)) {
